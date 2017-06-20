@@ -22,7 +22,8 @@ for i in range(gameWindowHeight/Scale):
     Row.append([])
 
 # some essential variables for the player and others
-ROD = 60    # Rate of drop, slowly decreases each incremented level
+ROD = 30    # Rate of drop, slowly decreases each incremented level
+RODcounter = 0
 DROPFAST = False
 LEFT = False
 RIGHT = False
@@ -49,9 +50,6 @@ class block():
         self.rect.left = self.x
 
     def drop(self):
-        #print self.grounded
-        #if grounded:
-            #return self.get_y
         if self.y + self.scale < gameWindowHeight and not self.grounded:
             self.y += self.scale
         else:
@@ -59,6 +57,9 @@ class block():
 
     def get_y(self):
         return self.y/self.scale
+
+    def set_y(self, y):
+        self.y += y * self.scale
 
     def get_x(self):
         return self.x/self.scale
@@ -93,6 +94,7 @@ while True:
             if event.key == K_DOWN or event.key == K_s:
                 DROPFAST = False
 
+    # This variable keeps the blocks within the game space.
     blocksx = activeBlock.get_x()
     if RIGHT or LEFT:
         if blocksx <= 0:
@@ -103,7 +105,7 @@ while True:
         LEFT = False
         RIGHT = False
 
-    # This loop goes through each block that is sationary, compares with the active block('s) and grounds them
+    # This loop goes through each block that is stationary, compares with the active block('s) and grounds them
     for i in range(len(Row)):
         for x in range(len(Row[i])):
             checkColy = activeBlock.get_y()
@@ -111,29 +113,32 @@ while True:
             if checkColy + 1 == Row[i][x].get_y() and checkColx == Row[i][x].get_x():
                 activeBlock.setGrounded(True)
 
-
-    if ROD >30 or DROPFAST:
+    # The rate of drop counter, keeping the game going at a decent pace.
+    if RODcounter > ROD or DROPFAST:
         gety = activeBlock.drop()
-        ROD = 0
+        RODcounter = 0
         if gety:
             Row[gety].append(activeBlock)
             activeBlock = block()
-    ROD += 1
+    RODcounter += 1
 
+    # This is the scoring system which deletes a row if it has a length of 10.
     for r in range(len(Row)):
         if len(Row[r]) == 10:
             for x in range(-len(Row[r])+1, 1):
                 Row[r].pop(-x)
-            for y in range(len(Row)):
-                for i in range(len(Row[y])):
-                    Row[y][i].setGrounded(False)
+            for y in range(-len(Row)+1, 1):
+                for i in range(-len(Row[-y])+1, 1):
+                    Row[-y][-i].set_y(1)
+                    Row[-y+1].append(Row[-y][-i])
+                    Row[-y].pop(-i)
+
+
 
     activeBlock.update()
 
     for y in range(len(Row)):
         for i in range(len(Row[y])):
-            Row[y][i].drop()
-            Row[y][i].show()
             Row[y][i].update()
 
 
