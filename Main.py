@@ -5,7 +5,7 @@ windowWidth = 800
 windowHeight = 800
 gameWindowWidth = windowWidth/2
 gameWindowHeight = windowHeight - 40
-Scale = 40
+Scale = gameWindowWidth/10
 
 pygame.init()
 
@@ -27,6 +27,12 @@ RODcounter = 0
 DROPFAST = False
 LEFT = False
 RIGHT = False
+currentShape = random.randint(0, 4) # generates an number which will be associated with a shape.
+#0 = Triangle
+#1 = Square
+#2 = L
+#3 = reverse L
+#4 = Line
 
 # Setting the surfaces which to draw Objects onto
 windowSurface = pygame.display.set_mode((windowWidth, windowHeight))
@@ -36,7 +42,7 @@ mainClock = pygame.time.Clock()
 # Setting up the object for tetris blocks
 class block():
     def __init__(self):
-        self.scale = gameWindowWidth/10
+        self.scale = Scale
         self.x = self.scale * 5
         self.y = 0
         self.rect = pygame.Rect(0, 0, self.scale, self.scale)
@@ -59,10 +65,13 @@ class block():
         return self.y/self.scale
 
     def set_y(self, y):
-        self.y += y * self.scale
+        self.y = y * self.scale
 
     def get_x(self):
         return self.x/self.scale
+
+    def set_x(self, x):
+        self.x = x * self.scale
 
     def Direction(self, LEFT, RIGHT):
         if LEFT and not self.grounded:
@@ -73,7 +82,69 @@ class block():
     def setGrounded(self, grounded):
         self.grounded = grounded
 
-activeBlock = block()
+class triangleBlock():
+    def __init__(self):
+        self.triBlocks = [block(), block(), block(), block()]
+        self.triBlocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.orientation = 0
+        self.grounded = False
+
+    def update(self):
+        if not self.grounded:
+            if self.orientation == 0:
+                self.triBlocks[1].set_x(self.triBlocks[0].get_x() - 1)
+                self.triBlocks[1].set_y(self.triBlocks[0].get_y())
+                self.triBlocks[2].set_x(self.triBlocks[0].get_x() + 1)
+                self.triBlocks[2].set_y(self.triBlocks[0].get_y())
+                self.triBlocks[3].set_x(self.triBlocks[0].get_x())
+                self.triBlocks[3].set_y(self.triBlocks[0].get_y() - 1)
+
+        for boxes in self.triBlocks:
+            boxes.update()
+
+    def show(self):
+        for boxes in self.triBlocks:
+            boxes.show()
+            #print boxes.get_x()
+
+    def drop(self):
+        gety = self.triBlocks[0].drop()
+        if gety:
+            self.set_grounded()
+            return gety
+
+
+    def set_grounded(self):
+        self.grounded = True
+        for i in range(len(self.triBlocks)):
+            Row[self.triBlocks[i].get_y()].append(self.triBlocks[i])
+            self.triBlocks[i].setGrounded(True)
+
+    def Direction(self, LEFT, RIGHT):
+        self.triBlocks[0].Direction(LEFT, RIGHT)
+
+    def get_left(self):
+        if self.orientation == 0:
+            return self.triBlocks[1].get_x()
+
+    def get_right(self):
+        if self.orientation == 0:
+            return self.triBlocks[2].get_x()
+
+    def get_top(self):
+        if self.orientation == 0:
+            return self.triBlocks[3].get_y()
+
+    def get_bottom(self):
+        if self.orientation == 0:
+            return self.triBlocks[0].get_y()
+
+    def get_middle(self):
+        return self.triBlocks[0].get_x()
+
+
+testShape = triangleBlock()
+#activeBlock = block()
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -95,31 +166,34 @@ while True:
                 DROPFAST = False
 
     # This variable keeps the blocks within the game space.
-    blocksx = activeBlock.get_x()
+    blocksLx = testShape.get_left()
+    blocksRx = testShape.get_right()
     if RIGHT or LEFT:
-        if blocksx <= 0:
+        if blocksLx <= 0:
             LEFT = False
-        if blocksx >= gameWindowWidth/Scale - 1:
+        if blocksRx >= gameWindowWidth/Scale - 1:
             RIGHT = False
-        activeBlock.Direction(LEFT, RIGHT)
+        testShape.Direction(LEFT, RIGHT)
         LEFT = False
         RIGHT = False
 
     # This loop goes through each block that is stationary, compares with the active block('s) and grounds them
     for i in range(len(Row)):
         for x in range(len(Row[i])):
-            checkColy = activeBlock.get_y()
-            checkColx = activeBlock.get_x()
-            if checkColy + 1 == Row[i][x].get_y() and checkColx == Row[i][x].get_x():
-                activeBlock.setGrounded(True)
+            checkColy = testShape.get_bottom()
+            checkColLx = testShape.get_left()
+            checkColRx = testShape.get_right()
+
+            if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x():
+                testShape.set_grounded()
+                testShape = triangleBlock()
 
     # The rate of drop counter, keeping the game going at a decent pace.
     if RODcounter > ROD or DROPFAST:
-        gety = activeBlock.drop()
+        gety = testShape.drop()
         RODcounter = 0
         if gety:
-            Row[gety].append(activeBlock)
-            activeBlock = block()
+            testShape = triangleBlock()
     RODcounter += 1
 
     # This is the scoring system which deletes a row if it has a length of 10.
@@ -135,7 +209,8 @@ while True:
 
 
 
-    activeBlock.update()
+    #activeBlock.update()
+    testShape.update()
 
     for y in range(len(Row)):
         for i in range(len(Row[y])):
@@ -151,7 +226,8 @@ while True:
         for x in range(len(Row[i])):
             Row[i][x].show()
 
-    activeBlock.show()
+    #activeBlock.show()
+    testShape.show()
 
     windowSurface.blit(gameSpace, (20, 20))
     pygame.display.update()
