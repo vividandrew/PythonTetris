@@ -1,4 +1,4 @@
-import pygame, sys, random
+import pygame, sys, random, time
 from pygame.locals import *
 
 windowWidth = 800
@@ -11,6 +11,7 @@ pygame.init()
 
 # Colour schemes
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 GREY = (155, 155, 155)
 GREEN = (0, 100, 0)
 ORANGE = (200, 100, 0)
@@ -24,6 +25,8 @@ for i in range(gameWindowHeight/Scale):
 # some essential variables for the player and others
 ROD = 30    # Rate of drop, slowly decreases each incremented level
 RODcounter = 0
+lvl = 0
+score = 0
 DROPFAST = False
 LEFT = False
 RIGHT = False
@@ -34,6 +37,19 @@ currentShape = random.randint(0, 4) # generates an number which will be associat
 #2 = L
 #3 = reverse L
 #4 = Line
+
+# Set up the fonts
+font = pygame.font.SysFont('Arial', windowWidth/15)
+
+lvlFont = font.render("Level: " + str(lvl), False, WHITE, BLACK)
+lvlRect = lvlFont.get_rect()
+lvlRect.top = windowHeight/10
+lvlRect.left = windowWidth - (windowWidth/2) + Scale
+
+scoreFont = font.render("Score: " + str(score), False, WHITE, BLACK)
+scoreRect = scoreFont.get_rect()
+scoreRect.top = windowHeight/10 * 2
+scoreRect.left = windowWidth - (windowWidth/2) + Scale
 
 # Setting the surfaces which to draw Objects onto
 windowSurface = pygame.display.set_mode((windowWidth, windowHeight))
@@ -296,7 +312,7 @@ while True:
         ROTATE = False
 
     # The rate of drop counter, keeping the game going at a decent pace.
-    if RODcounter > ROD or DROPFAST:
+    if RODcounter > ROD - score or DROPFAST:
         activeShape.drop()
         activeShape.update()
         if activeShape.get_bottom() + 1 == gameWindowHeight/Scale:
@@ -336,6 +352,7 @@ while True:
     # This is the scoring system which deletes a row if it has a length of 10.
     for r in range(len(Row)):
         if len(Row[r]) == 10:
+            score += 100
             for x in range(-len(Row[r])+1, 1):
                 Row[r].pop(-x)
             for y in range(-len(Row)+1, 1):
@@ -346,8 +363,11 @@ while True:
 
 
 
-    #activeBlock.update()
+    # update objects
     activeShape.update()
+    lvlFont = font.render("Level: " + str(lvl), False, WHITE, BLACK)
+    scoreFont = font.render("Score: " + str(score), False, WHITE, BLACK)
+    lvl = score/1000
 
     for y in range(len(Row)):
         for i in range(len(Row[y])):
@@ -357,6 +377,14 @@ while True:
 
     # The draw events for objects
     windowSurface.fill(ORANGE)
+    for x in range(Scale, windowWidth, Scale):
+        for y in range(Scale, windowHeight, Scale):
+            pygame.draw.line(windowSurface, BLACK, (0, y), (windowWidth, y), 3)
+        pygame.draw.line(windowSurface, BLACK, (x, 0), (x, windowHeight), 3)
+
+    windowSurface.blit(lvlFont, lvlRect)
+    windowSurface.blit(scoreFont, scoreRect)
+
     gameSpace.fill(GREY)
 
     for i in range(len(Row)):
@@ -366,6 +394,6 @@ while True:
     #activeBlock.show()
     activeShape.show()
 
-    windowSurface.blit(gameSpace, (20, 20))
+    windowSurface.blit(gameSpace, (windowWidth/Scale, windowHeight/Scale))
     pygame.display.update()
     mainClock.tick(60)
