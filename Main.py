@@ -45,7 +45,7 @@ class block():
     def __init__(self):
         self.scale = Scale
         self.x = self.scale * 5
-        self.y = 0
+        self.y = self.scale
         self.rect = pygame.Rect(0, 0, self.scale, self.scale)
         self.grounded = False
 
@@ -130,17 +130,21 @@ class triangleBlock():
             #print boxes.get_x()
 
     def drop(self):
-        gety = self.triBlocks[0].drop()
-        if gety:
-            self.set_grounded()
-            return gety
+        #if self.get_bottom() + 1 == gameWindowHeight/Scale:
+            #self.set_grounded("Drop event")
+            #return True
+        #else:
+        return self.triBlocks[0].drop()
 
 
-    def set_grounded(self):
+    def set_grounded(self, callFrom):
         self.grounded = True
+        #print callFrom
         for i in range(len(self.triBlocks)):
+            #print self.triBlocks[i].get_y()
             Row[self.triBlocks[i].get_y()].append(self.triBlocks[i])
             self.triBlocks[i].setGrounded(True)
+        #print len(Row[17])
 
     def Direction(self, LEFT, RIGHT):
         self.triBlocks[0].Direction(LEFT, RIGHT)
@@ -203,6 +207,8 @@ class triangleBlock():
             return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y()]
 
 
+
+
 testShape = triangleBlock()
 #activeBlock = block()
 while True:
@@ -242,6 +248,16 @@ while True:
         testShape.Rotate()
         ROTATE = False
 
+    # The rate of drop counter, keeping the game going at a decent pace.
+    if RODcounter > ROD or DROPFAST:
+        testShape.drop()
+        testShape.update()
+        if testShape.get_bottom() + 1 == gameWindowHeight/Scale:
+            testShape.set_grounded("Drop")
+            testShape = triangleBlock()
+        RODcounter = 0
+    RODcounter += 1
+
     # This loop goes through each block that is stationary, compares with the active block('s) and grounds them
     for i in range(len(Row)):
         for x in range(len(Row[i])):
@@ -255,24 +271,18 @@ while True:
                     checkColTy = checkColTooth[1]
                     checkColTRx = checkColTooth[2]
                     if checkColTy + 1 == Row[i][x].get_y() and checkColTLx <= Row[i][x].get_x() and checkColTRx >= Row[i][x].get_x():
-                        testShape.set_grounded()
+                        testShape.set_grounded("Checking two tooth")
                         testShape = triangleBlock()
                 else:
                     checkColTx = checkColTooth[0]
                     checkColTy = checkColTooth[1]
                     if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
-                        testShape.set_grounded()
+                        testShape.set_grounded("Checking one tooth")
                         testShape = triangleBlock()
 
             elif checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
-                testShape.set_grounded()
+                testShape.set_grounded("Checking without a tooth")
                 testShape = triangleBlock()
-
-    # The rate of drop counter, keeping the game going at a decent pace.
-    if RODcounter > ROD or DROPFAST:
-        testShape.drop()
-        RODcounter = 0
-    RODcounter += 1
 
     # This is the scoring system which deletes a row if it has a length of 10.
     for r in range(len(Row)):
@@ -281,7 +291,7 @@ while True:
                 Row[r].pop(-x)
             for y in range(-len(Row)+1, 1):
                 for i in range(-len(Row[-y])+1, 1):
-                    Row[-y][-i].set_y(1)
+                    Row[-y][-i].set_y(-y+1)
                     Row[-y+1].append(Row[-y][-i])
                     Row[-y].pop(-i)
 
