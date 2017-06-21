@@ -27,6 +27,7 @@ RODcounter = 0
 DROPFAST = False
 LEFT = False
 RIGHT = False
+ROTATE = False
 currentShape = random.randint(0, 4) # generates an number which will be associated with a shape.
 #0 = Triangle
 #1 = Square
@@ -98,6 +99,27 @@ class triangleBlock():
                 self.triBlocks[2].set_y(self.triBlocks[0].get_y())
                 self.triBlocks[3].set_x(self.triBlocks[0].get_x())
                 self.triBlocks[3].set_y(self.triBlocks[0].get_y() - 1)
+            if self.orientation == 1:
+                self.triBlocks[1].set_x(self.triBlocks[0].get_x())
+                self.triBlocks[1].set_y(self.triBlocks[0].get_y() - 1)
+                self.triBlocks[2].set_x(self.triBlocks[0].get_x())
+                self.triBlocks[2].set_y(self.triBlocks[0].get_y() + 1)
+                self.triBlocks[3].set_x(self.triBlocks[0].get_x() + 1)
+                self.triBlocks[3].set_y(self.triBlocks[0].get_y())
+            if self.orientation == 2:
+                self.triBlocks[1].set_x(self.triBlocks[0].get_x() + 1)
+                self.triBlocks[1].set_y(self.triBlocks[0].get_y())
+                self.triBlocks[2].set_x(self.triBlocks[0].get_x() - 1)
+                self.triBlocks[2].set_y(self.triBlocks[0].get_y())
+                self.triBlocks[3].set_x(self.triBlocks[0].get_x())
+                self.triBlocks[3].set_y(self.triBlocks[0].get_y() + 1)
+            if self.orientation == 3:
+                self.triBlocks[1].set_x(self.triBlocks[0].get_x())
+                self.triBlocks[1].set_y(self.triBlocks[0].get_y() + 1)
+                self.triBlocks[2].set_x(self.triBlocks[0].get_x())
+                self.triBlocks[2].set_y(self.triBlocks[0].get_y() - 1)
+                self.triBlocks[3].set_x(self.triBlocks[0].get_x() - 1)
+                self.triBlocks[3].set_y(self.triBlocks[0].get_y())
 
         for boxes in self.triBlocks:
             boxes.update()
@@ -123,24 +145,62 @@ class triangleBlock():
     def Direction(self, LEFT, RIGHT):
         self.triBlocks[0].Direction(LEFT, RIGHT)
 
+    def Rotate(self):
+        self.orientation +=1
+        if self.orientation > 3:
+            self.orientation = 0
+
     def get_left(self):
         if self.orientation == 0:
             return self.triBlocks[1].get_x()
+        if self.orientation == 1:
+            return self.triBlocks[0].get_x()
+        if self.orientation == 2:
+            return self.triBlocks[3].get_x()
+        if self.orientation == 3:
+            return self.triBlocks[0].get_x()
 
     def get_right(self):
         if self.orientation == 0:
             return self.triBlocks[2].get_x()
+        if self.orientation == 1:
+            return self.triBlocks[2].get_x()
+        if self.orientation == 2:
+            return self.triBlocks[3].get_x()
+        if self.orientation == 3:
+            return self.triBlocks[2].get_x()
 
-    def get_top(self):
-        if self.orientation == 0:
-            return self.triBlocks[3].get_y()
+    #def get_top(self):
+    #    if self.orientation == 0:
+    #        return self.triBlocks[3].get_y()
+    #    if self.orientation == 1:
+    #        return self.triBlocks[1].get_y()
+    #    if self.orientation == 2:
+    #        return self.triBlocks[0].get_y()
+    #    if self.orientation == 3:
+    #        return self.triBlocks[2].get_y()
 
     def get_bottom(self):
         if self.orientation == 0:
             return self.triBlocks[0].get_y()
+        if self.orientation == 1:
+            return self.triBlocks[2].get_y()
+        if self.orientation == 2:
+            return self.triBlocks[3].get_y()
+        if self.orientation == 3:
+            return self.triBlocks[1].get_y()
 
-    def get_middle(self):
-        return self.triBlocks[0].get_x()
+    #def get_middle(self):
+    #    return self.triBlocks[0].get_x()
+    def get_tooth(self):
+        if self.orientation == 0:
+            return False
+        if self.orientation == 1:
+            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y()]
+        if self.orientation == 2:
+            return [self.triBlocks[2].get_x(), self.triBlocks[0].get_y(), self.triBlocks[1].get_x()]
+        if self.orientation == 3:
+            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y()]
 
 
 testShape = triangleBlock()
@@ -152,7 +212,7 @@ while True:
             sys.exit()
         if event.type == KEYDOWN:
             if event.key == K_UP or event.key == K_w:
-                print("spin 90")
+                ROTATE = True
             if event.key == K_DOWN or event.key == K_s:
                 DROPFAST = True
             if event.key == K_LEFT or event.key == K_a:
@@ -177,23 +237,41 @@ while True:
         LEFT = False
         RIGHT = False
 
+    # Rotate the current shape,
+    if ROTATE:
+        testShape.Rotate()
+        ROTATE = False
+
     # This loop goes through each block that is stationary, compares with the active block('s) and grounds them
     for i in range(len(Row)):
         for x in range(len(Row[i])):
             checkColy = testShape.get_bottom()
             checkColLx = testShape.get_left()
             checkColRx = testShape.get_right()
+            checkColTooth = testShape.get_tooth()
+            if checkColTooth:
+                if len(checkColTooth) > 2:
+                    checkColTLx = checkColTooth[0]
+                    checkColTy = checkColTooth[1]
+                    checkColTRx = checkColTooth[2]
+                    if checkColTy + 1 == Row[i][x].get_y() and checkColTLx <= Row[i][x].get_x() and checkColTRx >= Row[i][x].get_x():
+                        testShape.set_grounded()
+                        testShape = triangleBlock()
+                else:
+                    checkColTx = checkColTooth[0]
+                    checkColTy = checkColTooth[1]
+                    if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
+                        testShape.set_grounded()
+                        testShape = triangleBlock()
 
-            if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x():
+            elif checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
                 testShape.set_grounded()
                 testShape = triangleBlock()
 
     # The rate of drop counter, keeping the game going at a decent pace.
     if RODcounter > ROD or DROPFAST:
-        gety = testShape.drop()
+        testShape.drop()
         RODcounter = 0
-        if gety:
-            testShape = triangleBlock()
     RODcounter += 1
 
     # This is the scoring system which deletes a row if it has a length of 10.
