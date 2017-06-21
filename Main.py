@@ -174,15 +174,15 @@ class triangleBlock():
         if self.orientation == 3:
             return self.triBlocks[2].get_x()
 
-    #def get_top(self):
-    #    if self.orientation == 0:
-    #        return self.triBlocks[3].get_y()
-    #    if self.orientation == 1:
-    #        return self.triBlocks[1].get_y()
-    #    if self.orientation == 2:
-    #        return self.triBlocks[0].get_y()
-    #    if self.orientation == 3:
-    #        return self.triBlocks[2].get_y()
+    def get_top(self):
+        if self.orientation == 0:
+            return self.triBlocks[3].get_y()
+        if self.orientation == 1:
+            return self.triBlocks[1].get_y()
+        if self.orientation == 2:
+            return self.triBlocks[0].get_y()
+        if self.orientation == 3:
+            return self.triBlocks[2].get_y()
 
     def get_bottom(self):
         if self.orientation == 0:
@@ -194,22 +194,28 @@ class triangleBlock():
         if self.orientation == 3:
             return self.triBlocks[1].get_y()
 
+    def get_middley(self):
+        return self.triBlocks[0].get_y()
+
+    def get_middlex(self):
+        return self.triBlocks[0].get_x()
+
     #def get_middle(self):
     #    return self.triBlocks[0].get_x()
     def get_tooth(self):
         if self.orientation == 0:
             return False
         if self.orientation == 1:
-            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y()]
+            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y(), 1, 'Triangle']
         if self.orientation == 2:
-            return [self.triBlocks[2].get_x(), self.triBlocks[0].get_y(), self.triBlocks[1].get_x()]
+            return [self.triBlocks[2].get_x(), self.triBlocks[0].get_y(), self.triBlocks[1].get_x(), 2, 'Triangle']
         if self.orientation == 3:
-            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y()]
+            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y(), 3, 'Triangle']
 
 
 
 
-testShape = triangleBlock()
+activeShape = triangleBlock()
 #activeBlock = block()
 while True:
     for event in pygame.event.get():
@@ -231,58 +237,101 @@ while True:
             if event.key == K_DOWN or event.key == K_s:
                 DROPFAST = False
 
-    # This variable keeps the blocks within the game space.
-    blocksLx = testShape.get_left()
-    blocksRx = testShape.get_right()
+    # This variable keeps the blocks within the game space. accepting the tooth as an extention of the shape
+    blocksTooth = activeShape.get_tooth()
+    if blocksTooth:
+        if blocksTooth[len(blocksTooth)-1] == 'Triangle':
+            if len(blocksTooth) > 4:
+                blocksLx = blocksTooth[0]
+                blocksRx = blocksTooth[2]
+            else:
+                if blocksTooth[2] == 1:
+                    blocksLx = activeShape.get_left()
+                    blocksRx = blocksTooth[0]
+                if blocksTooth[2] == 3:
+                    blocksRx = activeShape.get_right()
+                    blocksLx = blocksTooth[0]
+    else:
+        blocksLx = activeShape.get_left()
+        blocksRx = activeShape.get_right()
+
+    #If the player tries to clip out of game space it pushes them back in.
+    if blocksLx < 0:
+        activeShape.Direction(False, True)
+    if blocksRx > gameWindowWidth / Scale - 1:
+        activeShape.Direction(True, False)
+
+    # this controls the shape to not intersect with the blocks that have been grounded.
+    if blocksTooth:
+        for y in range(len(Row)):
+            for x in range(len(Row[y])):
+                checkColx = Row[y][x].get_x()
+                checkColy = Row[y][x].get_y()
+                if activeShape.get_top() == checkColy and blocksTooth[3] == 2:
+                    if blocksLx - 1 == checkColx:
+                        LEFT = False
+                    if blocksRx + 1 == checkColx:
+                        RIGHT = False
+                elif activeShape.get_middley() == checkColy and (blocksTooth[2] == 1 or blocksTooth[2] == 3):
+                    if blocksLx - 1 == checkColx:
+                        LEFT = False
+                    if blocksRx + 1 == checkColx:
+                        RIGHT = False
+
+
+    #Move the Shape left or right within limits
     if RIGHT or LEFT:
         if blocksLx <= 0:
             LEFT = False
         if blocksRx >= gameWindowWidth/Scale - 1:
             RIGHT = False
-        testShape.Direction(LEFT, RIGHT)
+
+        activeShape.Direction(LEFT, RIGHT)
         LEFT = False
         RIGHT = False
 
     # Rotate the current shape,
     if ROTATE:
-        testShape.Rotate()
+        activeShape.Rotate()
         ROTATE = False
 
     # The rate of drop counter, keeping the game going at a decent pace.
     if RODcounter > ROD or DROPFAST:
-        testShape.drop()
-        testShape.update()
-        if testShape.get_bottom() + 1 == gameWindowHeight/Scale:
-            testShape.set_grounded("Drop")
-            testShape = triangleBlock()
+        activeShape.drop()
+        activeShape.update()
+        if activeShape.get_bottom() + 1 == gameWindowHeight/Scale:
+            activeShape.set_grounded("Drop")
+            activeShape = triangleBlock()
         RODcounter = 0
     RODcounter += 1
 
     # This loop goes through each block that is stationary, compares with the active block('s) and grounds them
     for i in range(len(Row)):
         for x in range(len(Row[i])):
-            checkColy = testShape.get_bottom()
-            checkColLx = testShape.get_left()
-            checkColRx = testShape.get_right()
-            checkColTooth = testShape.get_tooth()
+            checkColy = activeShape.get_bottom()
+            checkColLx = activeShape.get_left()
+            checkColRx = activeShape.get_right()
+            checkColTooth = activeShape.get_tooth()
+            #if checkColTooth[len(checkColTooth) - 1] == 'Triangle':
             if checkColTooth:
-                if len(checkColTooth) > 2:
-                    checkColTLx = checkColTooth[0]
-                    checkColTy = checkColTooth[1]
-                    checkColTRx = checkColTooth[2]
-                    if checkColTy + 1 == Row[i][x].get_y() and checkColTLx <= Row[i][x].get_x() and checkColTRx >= Row[i][x].get_x():
-                        testShape.set_grounded("Checking two tooth")
-                        testShape = triangleBlock()
-                else:
-                    checkColTx = checkColTooth[0]
-                    checkColTy = checkColTooth[1]
-                    if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
-                        testShape.set_grounded("Checking one tooth")
-                        testShape = triangleBlock()
+                if checkColTooth[len(checkColTooth)-1] == 'Triangle':
+                    if len(checkColTooth) > 4:
+                        checkColTLx = checkColTooth[0]
+                        checkColTy = checkColTooth[1]
+                        checkColTRx = checkColTooth[2]
+                        if checkColTy + 1 == Row[i][x].get_y() and checkColTLx <= Row[i][x].get_x() and checkColTRx >= Row[i][x].get_x():
+                            activeShape.set_grounded("Checking two tooth")
+                            activeShape = triangleBlock()
+                    else:
+                        checkColTx = checkColTooth[0]
+                        checkColTy = checkColTooth[1]
+                        if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
+                            activeShape.set_grounded("Checking one tooth")
+                            activeShape = triangleBlock()
 
-            elif checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
-                testShape.set_grounded("Checking without a tooth")
-                testShape = triangleBlock()
+            if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
+                activeShape.set_grounded("Checking without a tooth")
+                activeShape = triangleBlock()
 
     # This is the scoring system which deletes a row if it has a length of 10.
     for r in range(len(Row)):
@@ -298,7 +347,7 @@ while True:
 
 
     #activeBlock.update()
-    testShape.update()
+    activeShape.update()
 
     for y in range(len(Row)):
         for i in range(len(Row[y])):
@@ -315,7 +364,7 @@ while True:
             Row[i][x].show()
 
     #activeBlock.show()
-    testShape.show()
+    activeShape.show()
 
     windowSurface.blit(gameSpace, (20, 20))
     pygame.display.update()
