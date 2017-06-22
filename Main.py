@@ -30,6 +30,7 @@ ROD = 30    # Rate of drop, slowly decreases each incremented level
 RODcounter = 0
 lvl = 0
 score = 0
+Turn = True
 DROPFAST = False
 LEFT = False
 RIGHT = False
@@ -483,9 +484,9 @@ class reverseLBlock():
         if self.orientation == 0:
             return self.Blocks[0].get_x()
         if self.orientation == 1:
-            return self.Blocks[0].get_x()
+            return self.Blocks[3].get_x()
         if self.orientation == 2:
-            return self.Blocks[0].get_x()
+            return self.Blocks[1].get_x()
         if self.orientation == 3:
             return self.Blocks[0].get_x()
 
@@ -871,9 +872,9 @@ while True:
         activeShape.Direction(LEFT, RIGHT)
         LEFT = False
         RIGHT = False
-
+    activeShape.update()
+    
     # Rotate the current shape,
-    Turn = True
     if ROTATE:
         orientation = activeShape.get_orientation()
         #Rules for the rotation, stops the shape rotating into another shape.
@@ -882,12 +883,18 @@ while True:
                 if orientation[1] == 'line':
                     for l in range(1,4):
                         if orientation[0] == 0:
+                            if activeShape.get_middlex() + l == windowWidth and activeShape.get_middlex() - l == Row[y][x].get_x():
+                                Turn = False
                             if activeShape.get_middlex() + l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                 Turn = False
                         if orientation[0] == 1:
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + l == Row[y][x].get_y():
                                 Turn = False
+                            if activeShape.get_middley() >= windowHeight/Scale - 4:
+                                Turn = False
                         if orientation[0] == 2:
+                            if activeShape.get_middlex() - l == 0 and activeShape.get_middlex() + l == Row[y][x].get_x():
+                                Turn = False
                             if activeShape.get_middlex() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                 Turn = False
                         if orientation[0] == 3:
@@ -900,15 +907,23 @@ while True:
                                 Turn = False
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + 1 == Row[y][x].get_y():
                                 Turn = False
+                            if activeShape.get_y()+ 1 > windowHeight/Scale:
+                                Turn = False
+                            if activeShape.get_middlex() + l == windowWidth and activeShape.get_middlex() - l == Row[y][x].get_x():
+                                Turn = False
                         if orientation[0] == 1:
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + l == Row[y][x].get_y():
                                 Turn = False
                             if activeShape.get_middlex() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                 Turn = False
+                            if activeShape.get_y()+ 2 > windowHeight/Scale:
+                                Turn = False
                         if orientation[0] == 2:
                             if activeShape.get_left() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                 Turn = False
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - 1 == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() - l == 0 and activeShape.get_middlex() + l == Row[y][x].get_x():
                                 Turn = False
                         if orientation[0] == 3:
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - l == Row[y][x].get_y():
@@ -921,10 +936,14 @@ while True:
                                 Turn = False
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - 1 == Row[y][x].get_y():
                                     Turn = False
+                            if activeShape.get_middlex() + l == windowWidth and activeShape.get_middlex() - l == Row[y][x].get_x():
+                                Turn = False
                         if orientation[0] == 1:
                             if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + l == Row[y][x].get_y():
                                 Turn = False
                             if activeShape.get_middlex() + 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_y()+ 2 > windowHeight/Scale:
                                 Turn = False
                         if orientation[0] == 2:
                             if activeShape.get_left() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
@@ -936,6 +955,8 @@ while True:
                                 Turn = False
                             if activeShape.get_left() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                 Turn = False
+                            if activeShape.get_y() + 1 > windowHeight / Scale:
+                                Turn = False
                 if orientation[1] == 'triangle':
                     if orientation[0] == 0:
                         if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + 1 == Row[y][x].get_y():
@@ -943,17 +964,21 @@ while True:
                     if orientation[0] == 1:
                         if activeShape.get_left() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                             Turn = False
+                        if activeShape.get_middlex() - 1 == 0 and activeShape.get_middlex() + 1 == Row[y][x].get_x():
+                            Turn = False
                     if orientation[0] == 2:
                         if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - 1 == Row[y][x].get_y():
                             Turn = False
                     if orientation[0] == 3:
                         if activeShape.get_middlex() + 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                             Turn = False
+                        if activeShape.get_middlex() + 1 == 0 and activeShape.get_middlex() - 1 == Row[y][x].get_x():
+                            Turn = False
 
         if Turn:
             activeShape.Rotate()
         ROTATE = False
-
+        Turn = True
     # The rate of drop counter, keeping the game going at a decent pace.
     if RODcounter > ROD - lvl or DROPFAST:
         activeShape.drop()
