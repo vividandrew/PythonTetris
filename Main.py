@@ -15,7 +15,9 @@ WHITE = (255, 255, 255)
 GREY = (155, 155, 155)
 GREEN = (0, 100, 0)
 ORANGE = (200, 100, 0)
+BLUE = (0, 0, 100)
 PURPLE = (100, 0, 100)
+YELLOW = (100, 100, 0)
 RED = (255, 0, 0)
 
 # This variable holds the Row numbers for later scoring system.
@@ -44,17 +46,34 @@ font = pygame.font.SysFont('Arial', windowWidth/15)
 
 lvlFont = font.render("Level: " + str(lvl), False, WHITE, BLACK)
 lvlRect = lvlFont.get_rect()
-lvlRect.top = windowHeight/10
-lvlRect.left = windowWidth - (windowWidth/2) + Scale
+lvlRect.top = windowHeight/10 + Scale
+lvlRect.left = windowWidth - (windowWidth/2) + Scale * 2
 
 scoreFont = font.render("Score: " + str(score), False, WHITE, BLACK)
 scoreRect = scoreFont.get_rect()
-scoreRect.top = windowHeight/10 * 2
-scoreRect.left = windowWidth - (windowWidth/2) + Scale
+scoreRect.top = windowHeight/10 + Scale * 3
+scoreRect.left = windowWidth - (windowWidth/2) + Scale * 2
+
+insFont = pygame.font.SysFont('Arial', windowWidth/40)
+instFont = []
+instRect = []
+instFont.append(insFont.render("How to play", False, WHITE,  BLACK))
+instFont.append(insFont.render("Press W or up key to rotate shape", False, WHITE, BLACK))
+instFont.append(insFont.render("Press A or left to move shape left", False, WHITE, BLACK))
+instFont.append(insFont.render("Press D or right key to move shape right", False, WHITE, BLACK))
+instFont.append(insFont.render("Press S or down key to go down quicker", False, WHITE, BLACK))
+
+for i in range(len(instFont)):
+    instRect.append(instFont[i].get_rect())
+    instRect[i].top = windowHeight/2 + Scale/2 * (11 + i) + i*10
+    instRect[i].left = windowWidth - (windowWidth/2) + Scale/2
+    instRect[i].width = 400
 
 # Setting the surfaces which to draw Objects onto
 windowSurface = pygame.display.set_mode((windowWidth, windowHeight))
+pygame.display.set_caption("Python Tetris")
 gameSpace = pygame.Surface((gameWindowWidth, gameWindowHeight))
+nextShapeSurf = pygame.Surface((Scale*5, Scale*6))
 mainClock = pygame.time.Clock()
 
 # the structor of the shapes
@@ -64,15 +83,23 @@ class block():
         self.x = self.scale * 5
         self.y = self.scale
         self.rect = pygame.Rect(0, 0, self.scale, self.scale)
+        self.colourRect = pygame.Rect(0, 0, self.scale-self.scale/5, self.scale-self.scale/5)
         self.grounded = False
         self.colour = colour
 
-    def show(self):
-        pygame.draw.rect(gameSpace, self.colour, self.rect)
+    def show(self, display=False):
+        if display:
+            pygame.draw.rect(nextShapeSurf, BLACK, self.rect)
+            pygame.draw.rect(nextShapeSurf, self.colour, self.colourRect)
+        else:
+            pygame.draw.rect(gameSpace, BLACK, self.rect)
+            pygame.draw.rect(gameSpace, self.colour, self.colourRect)
 
     def update(self):
         self.rect.top = self.y
         self.rect.left = self.x
+        self.colourRect.top = self.rect.top + (self.scale/10)
+        self.colourRect.left = self.rect.left + (self.scale / 10)
 
     def drop(self):
         if self.y + self.scale < gameWindowHeight and not self.grounded:
@@ -143,9 +170,13 @@ class triangleBlock():
         for boxes in self.Blocks:
             boxes.update()
 
-    def show(self):
+    def show(self, display=False):
         for boxes in self.Blocks:
-            boxes.show()
+            if display:
+                self.Blocks[0].set_x(2)
+                self.Blocks[0].set_y(3)
+                self.update()
+            boxes.show(display)
             #print boxes.get_x()
 
     def drop(self):
@@ -274,9 +305,13 @@ class LBlock():
         for boxes in self.Blocks:
             boxes.update()
 
-    def show(self):
+    def show(self, display=False):
         for boxes in self.Blocks:
-            boxes.show()
+            if display:
+                self.Blocks[0].set_x(2)
+                self.Blocks[0].set_y(3.5)
+                self.update()
+            boxes.show(display)
 
     def drop(self):
         return self.Blocks[0].drop()
@@ -359,7 +394,7 @@ class LBlock():
 # properties for the reverseL shape
 class reverseLBlock():
     def __init__(self):
-        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks = [block(BLUE), block(BLUE), block(BLUE), block(BLUE)]
         self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
         self.orientation = 0
         self.grounded = False
@@ -398,9 +433,13 @@ class reverseLBlock():
         for boxes in self.Blocks:
             boxes.update()
 
-    def show(self):
+    def show(self, display=False):
         for boxes in self.Blocks:
-            boxes.show()
+            if display:
+                self.Blocks[0].set_x(2)
+                self.Blocks[0].set_y(3.5)
+                self.update()
+            boxes.show(display)
 
     def drop(self):
         return self.Blocks[0].drop()
@@ -455,9 +494,9 @@ class reverseLBlock():
         if self.orientation == 0:
             return self.Blocks[0].get_y()
         if self.orientation == 1:
-            return self.Blocks[1].get_y()
+            return self.Blocks[0].get_y()
         if self.orientation == 2:
-            return self.Blocks[3].get_y()
+            return self.Blocks[1].get_y()
         if self.orientation == 3:
             return self.Blocks[0].get_y()
 
@@ -483,7 +522,7 @@ class reverseLBlock():
 # properties for the square shape
 class squareBlock():
     def __init__(self):
-        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks = [block(YELLOW), block(YELLOW), block(YELLOW), block(YELLOW)]
         self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
         self.orientation = 0
         self.grounded = False
@@ -500,9 +539,13 @@ class squareBlock():
         for boxes in self.Blocks:
             boxes.update()
 
-    def show(self):
+    def show(self, display=False):
         for boxes in self.Blocks:
-            boxes.show()
+            if display:
+                self.Blocks[0].set_x(1.5)
+                self.Blocks[0].set_y(2)
+                self.update()
+            boxes.show(display)
 
     def drop(self):
         return self.Blocks[0].drop()
@@ -531,10 +574,10 @@ class squareBlock():
         return self.Blocks[1].get_x()
 
     def get_top(self):
-        return self.Blocks[3].get_y()
+        return self.Blocks[0].get_y()
 
     def get_bottom(self):
-        return self.Blocks[0].get_y()
+        return self.Blocks[3].get_y()
 
     def get_middley(self):
         return self.Blocks[0].get_y()
@@ -551,10 +594,11 @@ class squareBlock():
 # properties for the line shape
 class lineBlock():
     def __init__(self):
-        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks = [block(PURPLE), block(PURPLE), block(PURPLE), block(PURPLE)]
         self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
         self.orientation = 0
         self.grounded = False
+
 
     def update(self):
         if not self.grounded:
@@ -590,9 +634,13 @@ class lineBlock():
         for boxes in self.Blocks:
             boxes.update()
 
-    def show(self):
+    def show(self, display=False):
         for boxes in self.Blocks:
-            boxes.show()
+            if display:
+                self.Blocks[0].set_x(2)
+                self.Blocks[0].set_y(4)
+                self.update()
+            boxes.show(display)
 
     def drop(self):
         return self.Blocks[0].drop()
@@ -665,8 +713,22 @@ class lineBlock():
     def get_grounded(self):
         return self.grounded
 
+def nextShape():
+    global currentShape, activeShape
 
-activeShape = lineBlock()
+    if currentShape == 0:
+        activeShape = triangleBlock()
+    if currentShape == 1:
+        activeShape = squareBlock()
+    if currentShape == 2:
+        activeShape = LBlock()
+    if currentShape == 3:
+        activeShape = reverseLBlock()
+    if currentShape == 4:
+        activeShape = lineBlock()
+    currentShape = random.randint(0, 4)
+
+nextShape()
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -765,10 +827,23 @@ while True:
                             LEFT = False
                         if blocksRx + 2 == checkColx:
                             RIGHT = False
-            elif activeShape.get_left() - 1 == checkColx and activeShape.get_middley() == checkColy:
-                LEFT = False
-            elif activeShape.get_right() + 1 == checkColx and activeShape.get_middley() == checkColy:
-                RIGHT = False
+                if activeShape.get_left() - 1 == checkColx and activeShape.get_middley() == checkColy:
+                    LEFT = False
+                if activeShape.get_right() + 1 == checkColx and activeShape.get_middley() == checkColy:
+                    RIGHT = False
+            else:
+                if activeShape.get_left() - 1 == checkColx:
+                    for i in range(activeShape.get_top(), activeShape.get_bottom()):
+                        if i == checkColy:
+                            LEFT = False
+                if activeShape.get_right() + 1 == checkColx:
+                    for i in range(activeShape.get_top(), activeShape.get_bottom()):
+                        if i == checkColy:
+                            RIGHT = False
+            if activeShape.get_left() - 1 == checkColx and activeShape.get_middley() == checkColy:
+                    LEFT = False
+            if activeShape.get_right() + 1 == checkColx and activeShape.get_middley() == checkColy:
+                    RIGHT = False
 
 
     #Move the Shape left or right within limits
@@ -793,7 +868,7 @@ while True:
         activeShape.update()
         if activeShape.get_bottom() + 1 == gameWindowHeight/Scale:
             activeShape.set_grounded("Drop")
-            activeShape = lineBlock()
+            nextShape()
         RODcounter = 0
     RODcounter += 1
 
@@ -813,41 +888,39 @@ while True:
                         checkColTRx = checkColTooth[2]
                         if checkColTy + 1 == Row[i][x].get_y() and checkColTLx <= Row[i][x].get_x() and checkColTRx >= Row[i][x].get_x():
                             activeShape.set_grounded("Checking two tooth")
-                            activeShape = lineBlock()
+                            nextShape()
                     else:
                         checkColTx = checkColTooth[0]
                         checkColTy = checkColTooth[1]
                         if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
                             activeShape.set_grounded("Checking one tooth")
-                            activeShape = lineBlock()
+                            nextShape()
 
                 if checkColTooth[len(checkColTooth) - 1] == 'L':
                     checkColTx = checkColTooth[0]
                     checkColTy = checkColTooth[1]
                     if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
                         activeShape.set_grounded("Checking one tooth")
-                        activeShape = lineBlock()
+                        nextShape()
 
             if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
                 activeShape.set_grounded("Checking without a tooth")
-                activeShape = lineBlock()
+                nextShape()
 
     # This is the scoring system which deletes a row if it has a length of 10.
     cleared = 0
-    for r in range(len(Row)):
-        if len(Row[r]) == 10:
+    for r in range(-len(Row) + 1, 1):
+        if len(Row[-r]) == 10:
             cleared += 1
-        if len(Row[r]) == 10:
             score += 100
-            for x in range(-len(Row[r])+1, 1):
-                Row[r].pop(-x)
-            for y in range(-len(Row)+2, 1):
-                for i in range(-len(Row[-y])+1, 1):
-                    #print y
-                    #print i
-                    Row[-y][-i].set_y(-y+cleared)
-                    Row[-y+cleared].append(Row[-y][-i])
-                    Row[-y].pop(-i)
+            for x in range(-len(Row[-r])+1, 1):
+                Row[-r].pop(-x)
+    if cleared > 0:
+        for y in range(-len(Row)+2, 1):
+            for i in range(-len(Row[-y])+1, 1):
+                Row[-y][-i].set_y(-y+cleared)
+                Row[-y+cleared].append(Row[-y][-i])
+                Row[-y].pop(-i)
 
 
 
@@ -874,6 +947,9 @@ while True:
     windowSurface.blit(lvlFont, lvlRect)
     windowSurface.blit(scoreFont, scoreRect)
 
+    for i in range(len(instFont)):
+        windowSurface.blit(instFont[i], instRect[i])
+
     gameSpace.fill(GREY)
 
     for i in range(len(Row)):
@@ -883,6 +959,29 @@ while True:
     #activeBlock.show()
     activeShape.show()
 
+    if currentShape == 0:
+        nextShapeSurf.fill(BLACK)
+        triangleBlock.show(triangleBlock(), True)
+    if currentShape == 1:
+        nextShapeSurf.fill(BLACK)
+        squareBlock.show(squareBlock(), True)
+    if currentShape == 2:
+        nextShapeSurf.fill(BLACK)
+        LBlock.show(LBlock(), True)
+    if currentShape == 3:
+        nextShapeSurf.fill(BLACK)
+        reverseLBlock.show(reverseLBlock(), True)
+    if currentShape == 4:
+        nextShapeSurf.fill(BLACK)
+        lineBlock.show(lineBlock(), True)
+    if len(Row[0]) > 0:
+        for y in range(len(Row)):
+            for x in range(-len(Row[y])+1, 1):
+                Row[y].pop(-x)
+        score = 0
+        currentShape = random.randint(0,4)
+        nextShape()
+    windowSurface.blit(nextShapeSurf, ((windowWidth/2) + Scale * 2, windowHeight/10 + Scale * 5))
     windowSurface.blit(gameSpace, (windowWidth/Scale, windowHeight/Scale))
     pygame.display.update()
     mainClock.tick(60)
