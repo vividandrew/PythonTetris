@@ -16,6 +16,7 @@ GREY = (155, 155, 155)
 GREEN = (0, 100, 0)
 ORANGE = (200, 100, 0)
 PURPLE = (100, 0, 100)
+RED = (255, 0, 0)
 
 # This variable holds the Row numbers for later scoring system.
 Row = []
@@ -56,17 +57,18 @@ windowSurface = pygame.display.set_mode((windowWidth, windowHeight))
 gameSpace = pygame.Surface((gameWindowWidth, gameWindowHeight))
 mainClock = pygame.time.Clock()
 
-# Setting up the object for tetris blocks
+# the structor of the shapes
 class block():
-    def __init__(self):
+    def __init__(self, colour):
         self.scale = Scale
         self.x = self.scale * 5
         self.y = self.scale
         self.rect = pygame.Rect(0, 0, self.scale, self.scale)
         self.grounded = False
+        self.colour = colour
 
     def show(self):
-        pygame.draw.rect(gameSpace, GREEN, self.rect)
+        pygame.draw.rect(gameSpace, self.colour, self.rect)
 
     def update(self):
         self.rect.top = self.y
@@ -99,49 +101,50 @@ class block():
     def setGrounded(self, grounded):
         self.grounded = grounded
 
+# properties for the triangle shape
 class triangleBlock():
     def __init__(self):
-        self.triBlocks = [block(), block(), block(), block()]
-        self.triBlocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.Blocks = [block(GREEN), block(GREEN), block(GREEN), block(GREEN)]
+        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
         self.orientation = 0
         self.grounded = False
 
     def update(self):
         if not self.grounded:
             if self.orientation == 0:
-                self.triBlocks[1].set_x(self.triBlocks[0].get_x() - 1)
-                self.triBlocks[1].set_y(self.triBlocks[0].get_y())
-                self.triBlocks[2].set_x(self.triBlocks[0].get_x() + 1)
-                self.triBlocks[2].set_y(self.triBlocks[0].get_y())
-                self.triBlocks[3].set_x(self.triBlocks[0].get_x())
-                self.triBlocks[3].set_y(self.triBlocks[0].get_y() - 1)
+                self.Blocks[1].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() - 1)
             if self.orientation == 1:
-                self.triBlocks[1].set_x(self.triBlocks[0].get_x())
-                self.triBlocks[1].set_y(self.triBlocks[0].get_y() - 1)
-                self.triBlocks[2].set_x(self.triBlocks[0].get_x())
-                self.triBlocks[2].set_y(self.triBlocks[0].get_y() + 1)
-                self.triBlocks[3].set_x(self.triBlocks[0].get_x() + 1)
-                self.triBlocks[3].set_y(self.triBlocks[0].get_y())
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[3].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
             if self.orientation == 2:
-                self.triBlocks[1].set_x(self.triBlocks[0].get_x() + 1)
-                self.triBlocks[1].set_y(self.triBlocks[0].get_y())
-                self.triBlocks[2].set_x(self.triBlocks[0].get_x() - 1)
-                self.triBlocks[2].set_y(self.triBlocks[0].get_y())
-                self.triBlocks[3].set_x(self.triBlocks[0].get_x())
-                self.triBlocks[3].set_y(self.triBlocks[0].get_y() + 1)
+                self.Blocks[1].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() + 1)
             if self.orientation == 3:
-                self.triBlocks[1].set_x(self.triBlocks[0].get_x())
-                self.triBlocks[1].set_y(self.triBlocks[0].get_y() + 1)
-                self.triBlocks[2].set_x(self.triBlocks[0].get_x())
-                self.triBlocks[2].set_y(self.triBlocks[0].get_y() - 1)
-                self.triBlocks[3].set_x(self.triBlocks[0].get_x() - 1)
-                self.triBlocks[3].set_y(self.triBlocks[0].get_y())
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[3].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
 
-        for boxes in self.triBlocks:
+        for boxes in self.Blocks:
             boxes.update()
 
     def show(self):
-        for boxes in self.triBlocks:
+        for boxes in self.Blocks:
             boxes.show()
             #print boxes.get_x()
 
@@ -150,20 +153,20 @@ class triangleBlock():
             #self.set_grounded("Drop event")
             #return True
         #else:
-        return self.triBlocks[0].drop()
+        return self.Blocks[0].drop()
 
 
     def set_grounded(self, callFrom):
         self.grounded = True
         #print callFrom
-        for i in range(len(self.triBlocks)):
-            #print self.triBlocks[i].get_y()
-            Row[self.triBlocks[i].get_y()].append(self.triBlocks[i])
-            self.triBlocks[i].setGrounded(True)
+        for i in range(len(self.Blocks)):
+            #print self.Blocks[i].get_y()
+            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            self.Blocks[i].setGrounded(True)
         #print len(Row[17])
 
     def Direction(self, LEFT, RIGHT):
-        self.triBlocks[0].Direction(LEFT, RIGHT)
+        self.Blocks[0].Direction(LEFT, RIGHT)
 
     def Rotate(self):
         self.orientation +=1
@@ -172,67 +175,498 @@ class triangleBlock():
 
     def get_left(self):
         if self.orientation == 0:
-            return self.triBlocks[1].get_x()
+            return self.Blocks[1].get_x()
         if self.orientation == 1:
-            return self.triBlocks[0].get_x()
+            return self.Blocks[0].get_x()
         if self.orientation == 2:
-            return self.triBlocks[3].get_x()
+            return self.Blocks[3].get_x()
         if self.orientation == 3:
-            return self.triBlocks[0].get_x()
+            return self.Blocks[0].get_x()
 
     def get_right(self):
         if self.orientation == 0:
-            return self.triBlocks[2].get_x()
+            return self.Blocks[2].get_x()
         if self.orientation == 1:
-            return self.triBlocks[2].get_x()
+            return self.Blocks[0].get_x()
         if self.orientation == 2:
-            return self.triBlocks[3].get_x()
+            return self.Blocks[3].get_x()
         if self.orientation == 3:
-            return self.triBlocks[2].get_x()
+            return self.Blocks[2].get_x()
 
     def get_top(self):
         if self.orientation == 0:
-            return self.triBlocks[3].get_y()
+            return self.Blocks[3].get_y()
         if self.orientation == 1:
-            return self.triBlocks[1].get_y()
+            return self.Blocks[1].get_y()
         if self.orientation == 2:
-            return self.triBlocks[0].get_y()
+            return self.Blocks[0].get_y()
         if self.orientation == 3:
-            return self.triBlocks[2].get_y()
+            return self.Blocks[2].get_y()
 
     def get_bottom(self):
         if self.orientation == 0:
-            return self.triBlocks[0].get_y()
+            return self.Blocks[0].get_y()
         if self.orientation == 1:
-            return self.triBlocks[2].get_y()
+            return self.Blocks[2].get_y()
         if self.orientation == 2:
-            return self.triBlocks[3].get_y()
+            return self.Blocks[3].get_y()
         if self.orientation == 3:
-            return self.triBlocks[1].get_y()
+            return self.Blocks[1].get_y()
 
     def get_middley(self):
-        return self.triBlocks[0].get_y()
+        return self.Blocks[0].get_y()
 
     def get_middlex(self):
-        return self.triBlocks[0].get_x()
+        return self.Blocks[0].get_x()
 
-    #def get_middle(self):
-    #    return self.triBlocks[0].get_x()
     def get_tooth(self):
         if self.orientation == 0:
             return False
         if self.orientation == 1:
-            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y(), 1, 'Triangle']
+            return [self.Blocks[3].get_x(), self.Blocks[3].get_y(), 1, 'Triangle']
         if self.orientation == 2:
-            return [self.triBlocks[2].get_x(), self.triBlocks[0].get_y(), self.triBlocks[1].get_x(), 2, 'Triangle']
+            return [self.Blocks[2].get_x(), self.Blocks[0].get_y(), self.Blocks[1].get_x(), 2, 'Triangle']
         if self.orientation == 3:
-            return [self.triBlocks[3].get_x(), self.triBlocks[3].get_y(), 3, 'Triangle']
+            return [self.Blocks[3].get_x(), self.Blocks[3].get_y(), 3, 'Triangle']
+
+    def get_grounded(self):
+        return self.grounded
+
+# properties for the L shape
+class LBlock():
+    def __init__(self):
+        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.orientation = 0
+        self.grounded = False
+
+    def update(self):
+        if not self.grounded:
+            if self.orientation == 0:
+                self.Blocks[1].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() - 2)
+            if self.orientation == 1:
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x() + 2)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
+            if self.orientation == 2:
+                self.Blocks[1].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() + 2)
+            if self.orientation == 3:
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x() - 2)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
+
+        for boxes in self.Blocks:
+            boxes.update()
+
+    def show(self):
+        for boxes in self.Blocks:
+            boxes.show()
+
+    def drop(self):
+        return self.Blocks[0].drop()
 
 
+    def set_grounded(self, callFrom):
+        self.grounded = True
+        #print callFrom
+        for i in range(len(self.Blocks)):
+            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            self.Blocks[i].setGrounded(True)
+
+    def Direction(self, LEFT, RIGHT):
+        self.Blocks[0].Direction(LEFT, RIGHT)
+
+    def Rotate(self):
+        self.orientation +=1
+        if self.orientation > 3:
+            self.orientation = 0
+
+    def get_left(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_x()
+        if self.orientation == 1:
+            return self.Blocks[0].get_x()
+        if self.orientation == 2:
+            return self.Blocks[0].get_x()
+        if self.orientation == 3:
+            return self.Blocks[3].get_x()
+
+    def get_right(self):
+        if self.orientation == 0:
+            return self.Blocks[1].get_x()
+        if self.orientation == 1:
+            return self.Blocks[0].get_x()
+        if self.orientation == 2:
+            return self.Blocks[0].get_x()
+        if self.orientation == 3:
+            return self.Blocks[0].get_x()
+
+    def get_top(self):
+        if self.orientation == 0:
+            return self.Blocks[3].get_y()
+        if self.orientation == 1:
+            return self.Blocks[0].get_y()
+        if self.orientation == 2:
+            return self.Blocks[0].get_y()
+        if self.orientation == 3:
+            return self.Blocks[1].get_y()
+
+    def get_bottom(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_y()
+        if self.orientation == 1:
+            return self.Blocks[1].get_y()
+        if self.orientation == 2:
+            return self.Blocks[3].get_y()
+        if self.orientation == 3:
+            return self.Blocks[0].get_y()
+
+    def get_middley(self):
+        return self.Blocks[0].get_y()
+
+    def get_middlex(self):
+        return self.Blocks[0].get_x()
+
+    def get_tooth(self):
+        if self.orientation == 0:
+            return False
+        if self.orientation == 1:
+            return [self.Blocks[3].get_x(), self.Blocks[3].get_y(), 1, 'L']
+        if self.orientation == 2:
+            return [self.Blocks[1].get_x(), self.Blocks[1].get_y(), 2, 'L']
+        if self.orientation == 3:
+            return False
+
+    def get_grounded(self):
+        return self.grounded
+
+# properties for the reverseL shape
+class reverseLBlock():
+    def __init__(self):
+        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.orientation = 0
+        self.grounded = False
+
+    def update(self):
+        if not self.grounded:
+            if self.orientation == 0:
+                self.Blocks[1].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() - 2)
+            if self.orientation == 1:
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x() + 2)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
+            if self.orientation == 2:
+                self.Blocks[1].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() + 2)
+            if self.orientation == 3:
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x() - 2)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
+
+        for boxes in self.Blocks:
+            boxes.update()
+
+    def show(self):
+        for boxes in self.Blocks:
+            boxes.show()
+
+    def drop(self):
+        return self.Blocks[0].drop()
 
 
-activeShape = triangleBlock()
-#activeBlock = block()
+    def set_grounded(self, callFrom):
+        self.grounded = True
+        #print callFrom
+        for i in range(len(self.Blocks)):
+            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            self.Blocks[i].setGrounded(True)
+
+    def Direction(self, LEFT, RIGHT):
+        self.Blocks[0].Direction(LEFT, RIGHT)
+
+    def Rotate(self):
+        self.orientation +=1
+        if self.orientation > 3:
+            self.orientation = 0
+
+    def get_left(self):
+        if self.orientation == 0:
+            return self.Blocks[1].get_x()
+        if self.orientation == 1:
+            return self.Blocks[0].get_x()
+        if self.orientation == 2:
+            return self.Blocks[0].get_x()
+        if self.orientation == 3:
+            return self.Blocks[3].get_x()
+
+    def get_right(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_x()
+        if self.orientation == 1:
+            return self.Blocks[0].get_x()
+        if self.orientation == 2:
+            return self.Blocks[0].get_x()
+        if self.orientation == 3:
+            return self.Blocks[0].get_x()
+
+    def get_top(self):
+        if self.orientation == 0:
+            return self.Blocks[3].get_y()
+        if self.orientation == 1:
+            return self.Blocks[0].get_y()
+        if self.orientation == 2:
+            return self.Blocks[0].get_y()
+        if self.orientation == 3:
+            return self.Blocks[1].get_y()
+
+    def get_bottom(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_y()
+        if self.orientation == 1:
+            return self.Blocks[1].get_y()
+        if self.orientation == 2:
+            return self.Blocks[3].get_y()
+        if self.orientation == 3:
+            return self.Blocks[0].get_y()
+
+    def get_middley(self):
+        return self.Blocks[0].get_y()
+
+    def get_middlex(self):
+        return self.Blocks[0].get_x()
+
+    def get_tooth(self):
+        if self.orientation == 0:
+            return False
+        if self.orientation == 1:
+            return False
+        if self.orientation == 2:
+            return [self.Blocks[1].get_x(), self.Blocks[1].get_y(), 2, 'reverseL']
+        if self.orientation == 3:
+            return [self.Blocks[3].get_x(), self.Blocks[3].get_y(), 3, 'reverseL']
+
+    def get_grounded(self):
+        return self.grounded
+
+# properties for the square shape
+class squareBlock():
+    def __init__(self):
+        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.orientation = 0
+        self.grounded = False
+
+    def update(self):
+        if not self.grounded:
+            self.Blocks[1].set_x(self.Blocks[0].get_x() + 1)
+            self.Blocks[1].set_y(self.Blocks[0].get_y())
+            self.Blocks[2].set_x(self.Blocks[0].get_x())
+            self.Blocks[2].set_y(self.Blocks[0].get_y() + 1)
+            self.Blocks[3].set_x(self.Blocks[0].get_x() + 1)
+            self.Blocks[3].set_y(self.Blocks[0].get_y() + 1)
+
+        for boxes in self.Blocks:
+            boxes.update()
+
+    def show(self):
+        for boxes in self.Blocks:
+            boxes.show()
+
+    def drop(self):
+        return self.Blocks[0].drop()
+
+
+    def set_grounded(self, callFrom):
+        self.grounded = True
+        #print callFrom
+        for i in range(len(self.Blocks)):
+            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            self.Blocks[i].setGrounded(True)
+
+    def Direction(self, LEFT, RIGHT):
+        self.Blocks[0].Direction(LEFT, RIGHT)
+
+    def Rotate(self):
+        self.orientation +=1
+        if self.orientation > 3:
+            self.orientation = 0
+
+    def get_left(self):
+        return self.Blocks[0].get_x()
+
+
+    def get_right(self):
+        return self.Blocks[1].get_x()
+
+    def get_top(self):
+        return self.Blocks[3].get_y()
+
+    def get_bottom(self):
+        return self.Blocks[0].get_y()
+
+    def get_middley(self):
+        return self.Blocks[0].get_y()
+
+    def get_middlex(self):
+        return self.Blocks[0].get_x()
+
+    def get_tooth(self):
+        return False
+
+    def get_grounded(self):
+        return self.grounded
+
+# properties for the line shape
+class lineBlock():
+    def __init__(self):
+        self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
+        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.orientation = 0
+        self.grounded = False
+
+    def update(self):
+        if not self.grounded:
+            if self.orientation == 0:
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() - 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() - 2)
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() - 3)
+            if self.orientation == 1:
+                self.Blocks[1].set_x(self.Blocks[0].get_x() + 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x() + 2)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x() + 3)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
+            if self.orientation == 2:
+                self.Blocks[1].set_x(self.Blocks[0].get_x())
+                self.Blocks[1].set_y(self.Blocks[0].get_y() + 1)
+                self.Blocks[2].set_x(self.Blocks[0].get_x())
+                self.Blocks[2].set_y(self.Blocks[0].get_y() + 2)
+                self.Blocks[3].set_x(self.Blocks[0].get_x())
+                self.Blocks[3].set_y(self.Blocks[0].get_y() + 3)
+            if self.orientation == 3:
+                self.Blocks[1].set_x(self.Blocks[0].get_x() - 1)
+                self.Blocks[1].set_y(self.Blocks[0].get_y())
+                self.Blocks[2].set_x(self.Blocks[0].get_x() - 2)
+                self.Blocks[2].set_y(self.Blocks[0].get_y())
+                self.Blocks[3].set_x(self.Blocks[0].get_x() - 3)
+                self.Blocks[3].set_y(self.Blocks[0].get_y())
+
+        for boxes in self.Blocks:
+            boxes.update()
+
+    def show(self):
+        for boxes in self.Blocks:
+            boxes.show()
+
+    def drop(self):
+        return self.Blocks[0].drop()
+
+
+    def set_grounded(self, callFrom):
+        self.grounded = True
+        #print callFrom
+        for i in range(len(self.Blocks)):
+            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            self.Blocks[i].setGrounded(True)
+
+    def Direction(self, LEFT, RIGHT):
+        self.Blocks[0].Direction(LEFT, RIGHT)
+
+    def Rotate(self):
+        self.orientation +=1
+        if self.orientation > 3:
+            self.orientation = 0
+
+    def get_left(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_x()
+        if self.orientation == 1:
+            return self.Blocks[0].get_x()
+        if self.orientation == 2:
+            return self.Blocks[0].get_x()
+        if self.orientation == 3:
+            return self.Blocks[3].get_x()
+
+    def get_right(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_x()
+        if self.orientation == 1:
+            return self.Blocks[3].get_x()
+        if self.orientation == 2:
+            return self.Blocks[0].get_x()
+        if self.orientation == 3:
+            return self.Blocks[0].get_x()
+
+    def get_top(self):
+        if self.orientation == 0:
+            return self.Blocks[3].get_y()
+        if self.orientation == 1:
+            return self.Blocks[0].get_y()
+        if self.orientation == 2:
+            return self.Blocks[0].get_y()
+        if self.orientation == 3:
+            return self.Blocks[0].get_y()
+
+    def get_bottom(self):
+        if self.orientation == 0:
+            return self.Blocks[0].get_y()
+        if self.orientation == 1:
+            return self.Blocks[0].get_y()
+        if self.orientation == 2:
+            return self.Blocks[3].get_y()
+        if self.orientation == 3:
+            return self.Blocks[0].get_y()
+
+    def get_middley(self):
+        return self.Blocks[0].get_y()
+
+    def get_middlex(self):
+        return self.Blocks[0].get_x()
+
+    def get_tooth(self):
+        return False
+
+    def get_grounded(self):
+        return self.grounded
+
+
+activeShape = lineBlock()
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -253,7 +687,7 @@ while True:
             if event.key == K_DOWN or event.key == K_s:
                 DROPFAST = False
 
-    # This variable keeps the blocks within the game space. accepting the tooth as an extention of the shape
+    # This variable keeps the blocks within the game space. accepting the tooth as an extension of the shape
     blocksTooth = activeShape.get_tooth()
     if blocksTooth:
         if blocksTooth[len(blocksTooth)-1] == 'Triangle':
@@ -267,6 +701,21 @@ while True:
                 if blocksTooth[2] == 3:
                     blocksRx = activeShape.get_right()
                     blocksLx = blocksTooth[0]
+
+        if blocksTooth[len(blocksTooth)-1] == "L":
+            if blocksTooth[2] == 1:
+                blocksLx = activeShape.get_left()
+                blocksRx = blocksTooth[0]
+            if blocksTooth[2] == 2:
+                blocksRx = activeShape.get_right()
+                blocksLx = blocksTooth[0]
+        if blocksTooth[len(blocksTooth)-1] == "reverseL":
+            if blocksTooth[2] == 3:
+                blocksLx = blocksTooth[0]
+                blocksRx = activeShape.get_right()
+            if blocksTooth[2] == 2:
+                blocksRx = blocksTooth[0]
+                blocksLx = activeShape.get_right()
     else:
         blocksLx = activeShape.get_left()
         blocksRx = activeShape.get_right()
@@ -278,25 +727,52 @@ while True:
         activeShape.Direction(True, False)
 
     # this controls the shape to not intersect with the blocks that have been grounded.
-    if blocksTooth:
-        for y in range(len(Row)):
-            for x in range(len(Row[y])):
-                checkColx = Row[y][x].get_x()
-                checkColy = Row[y][x].get_y()
-                if activeShape.get_top() == checkColy and blocksTooth[3] == 2:
-                    if blocksLx - 1 == checkColx:
-                        LEFT = False
-                    if blocksRx + 1 == checkColx:
-                        RIGHT = False
-                elif activeShape.get_middley() == checkColy and (blocksTooth[2] == 1 or blocksTooth[2] == 3):
-                    if blocksLx - 1 == checkColx:
-                        LEFT = False
-                    if blocksRx + 1 == checkColx:
-                        RIGHT = False
+    for y in range(len(Row)):
+        for x in range(len(Row[y])):
+            checkColx = Row[y][x].get_x()
+            checkColy = Row[y][x].get_y()
+            if blocksTooth:
+                if blocksTooth[len(blocksTooth)-1] == "Triangle":
+                    if activeShape.get_top() == checkColy and blocksTooth[3] == 2:
+                        if blocksLx - 1 == checkColx:
+                            LEFT = False
+                        if blocksRx + 1 == checkColx:
+                            RIGHT = False
+                    elif activeShape.get_middley() == checkColy and (blocksTooth[2] == 1 or blocksTooth[2] == 3):
+                        if blocksLx - 1 == checkColx:
+                            LEFT = False
+                        if blocksRx + 1 == checkColx:
+                            RIGHT = False
+                if blocksTooth[len(blocksTooth) - 1] == "L":
+                    if activeShape.get_middley() == checkColy and blocksTooth[2] == 1:
+                        if blocksLx - 1 == checkColx:
+                            LEFT = False
+                        if blocksRx + 1 == checkColx:
+                            RIGHT = False
+                    elif activeShape.get_middley() == checkColy and blocksTooth[2] == 2:
+                        if blocksLx - 2 == checkColx:
+                            LEFT = False
+                        if blocksRx + 1 == checkColx:
+                            RIGHT = False
+                if blocksTooth[len(blocksTooth) - 1] == "reverseL":
+                    if activeShape.get_middley() == checkColy and blocksTooth[2] == 3:
+                        if blocksLx - 1 == checkColx:
+                            LEFT = False
+                        if blocksRx + 1 == checkColx:
+                            RIGHT = False
+                    elif activeShape.get_middley() == checkColy and blocksTooth[2] == 2:
+                        if blocksLx - 1 == checkColx:
+                            LEFT = False
+                        if blocksRx + 2 == checkColx:
+                            RIGHT = False
+            elif activeShape.get_left() - 1 == checkColx and activeShape.get_middley() == checkColy:
+                LEFT = False
+            elif activeShape.get_right() + 1 == checkColx and activeShape.get_middley() == checkColy:
+                RIGHT = False
 
 
     #Move the Shape left or right within limits
-    if RIGHT or LEFT:
+    if RIGHT or LEFT and not activeShape.get_grounded():
         if blocksLx <= 0:
             LEFT = False
         if blocksRx >= gameWindowWidth/Scale - 1:
@@ -312,12 +788,12 @@ while True:
         ROTATE = False
 
     # The rate of drop counter, keeping the game going at a decent pace.
-    if RODcounter > ROD - score or DROPFAST:
+    if RODcounter > ROD - lvl or DROPFAST:
         activeShape.drop()
         activeShape.update()
         if activeShape.get_bottom() + 1 == gameWindowHeight/Scale:
             activeShape.set_grounded("Drop")
-            activeShape = triangleBlock()
+            activeShape = lineBlock()
         RODcounter = 0
     RODcounter += 1
 
@@ -337,29 +813,42 @@ while True:
                         checkColTRx = checkColTooth[2]
                         if checkColTy + 1 == Row[i][x].get_y() and checkColTLx <= Row[i][x].get_x() and checkColTRx >= Row[i][x].get_x():
                             activeShape.set_grounded("Checking two tooth")
-                            activeShape = triangleBlock()
+                            activeShape = lineBlock()
                     else:
                         checkColTx = checkColTooth[0]
                         checkColTy = checkColTooth[1]
                         if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
                             activeShape.set_grounded("Checking one tooth")
-                            activeShape = triangleBlock()
+                            activeShape = lineBlock()
+
+                if checkColTooth[len(checkColTooth) - 1] == 'L':
+                    checkColTx = checkColTooth[0]
+                    checkColTy = checkColTooth[1]
+                    if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
+                        activeShape.set_grounded("Checking one tooth")
+                        activeShape = lineBlock()
 
             if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
                 activeShape.set_grounded("Checking without a tooth")
-                activeShape = triangleBlock()
+                activeShape = lineBlock()
 
     # This is the scoring system which deletes a row if it has a length of 10.
+    cleared = 0
     for r in range(len(Row)):
+        if len(Row[r]) == 10:
+            cleared += 1
         if len(Row[r]) == 10:
             score += 100
             for x in range(-len(Row[r])+1, 1):
                 Row[r].pop(-x)
-            for y in range(-len(Row)+1, 1):
+            for y in range(-len(Row)+2, 1):
                 for i in range(-len(Row[-y])+1, 1):
-                    Row[-y][-i].set_y(-y+1)
-                    Row[-y+1].append(Row[-y][-i])
+                    #print y
+                    #print i
+                    Row[-y][-i].set_y(-y+cleared)
+                    Row[-y+cleared].append(Row[-y][-i])
                     Row[-y].pop(-i)
+
 
 
 
@@ -367,7 +856,7 @@ while True:
     activeShape.update()
     lvlFont = font.render("Level: " + str(lvl), False, WHITE, BLACK)
     scoreFont = font.render("Score: " + str(score), False, WHITE, BLACK)
-    lvl = score/1000
+    lvl = int(score/1000)
 
     for y in range(len(Row)):
         for i in range(len(Row[y])):
