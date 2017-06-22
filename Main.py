@@ -1,3 +1,13 @@
+#! IMPORTANT
+# The player having 1 frame to move the center block
+# by updating the Shape before letting it get "groudned" a variable within the shapes/blocks
+# still needs further testing to see if the issue has been completly resolved.
+#
+# The player could move the object into the wall, causing the shape to return near the screen.
+# to counter act this, I've added a if statement within several parts of the rotate function,
+# not allowing it to rotate if there is the wall and a object that is thinner than the total width
+# of the shape.
+
 import pygame, sys, random, time
 from pygame.locals import *
 
@@ -873,7 +883,7 @@ while True:
         LEFT = False
         RIGHT = False
     activeShape.update()
-    
+
     # Rotate the current shape,
     if ROTATE:
         orientation = activeShape.get_orientation()
