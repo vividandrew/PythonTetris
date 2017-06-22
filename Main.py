@@ -57,16 +57,16 @@ scoreRect.left = windowWidth - (windowWidth/2) + Scale * 2
 insFont = pygame.font.SysFont('Arial', windowWidth/40)
 instFont = []
 instRect = []
-instFont.append(insFont.render("How to play", False, WHITE,  BLACK))
-instFont.append(insFont.render("Press W or up key to rotate shape", False, WHITE, BLACK))
-instFont.append(insFont.render("Press A or left to move shape left", False, WHITE, BLACK))
+instFont.append(insFont.render("                    How to play                     ", False, WHITE,  BLACK))
+instFont.append(insFont.render("Press W or up key to rotate shape        ", False, WHITE, BLACK))
+instFont.append(insFont.render("Press A or left to move shape left          ", False, WHITE, BLACK))
 instFont.append(insFont.render("Press D or right key to move shape right", False, WHITE, BLACK))
 instFont.append(insFont.render("Press S or down key to go down quicker", False, WHITE, BLACK))
 
 for i in range(len(instFont)):
     instRect.append(instFont[i].get_rect())
-    instRect[i].top = windowHeight/2 + Scale/2 * (11 + i) + i*10
-    instRect[i].left = windowWidth - (windowWidth/2) + Scale/2
+    instRect[i].top = windowHeight/2 + Scale/2 * (11 + i) + i*4
+    instRect[i].left = windowWidth - (windowWidth/2) + Scale
     instRect[i].width = 400
 
 # Setting the surfaces which to draw Objects onto
@@ -204,6 +204,9 @@ class triangleBlock():
         if self.orientation > 3:
             self.orientation = 0
 
+    def get_orientation(self):
+        return self.orientation, "triangle"
+
     def get_left(self):
         if self.orientation == 0:
             return self.Blocks[1].get_x()
@@ -331,6 +334,9 @@ class LBlock():
         self.orientation +=1
         if self.orientation > 3:
             self.orientation = 0
+
+    def get_orientation(self):
+        return self.orientation, "line"
 
     def get_left(self):
         if self.orientation == 0:
@@ -460,6 +466,9 @@ class reverseLBlock():
         if self.orientation > 3:
             self.orientation = 0
 
+    def get_orientation(self):
+        return self.orientation, "reverseL"
+
     def get_left(self):
         if self.orientation == 0:
             return self.Blocks[1].get_x()
@@ -496,9 +505,9 @@ class reverseLBlock():
         if self.orientation == 1:
             return self.Blocks[0].get_y()
         if self.orientation == 2:
-            return self.Blocks[1].get_y()
+            return self.Blocks[3].get_y()
         if self.orientation == 3:
-            return self.Blocks[0].get_y()
+            return self.Blocks[1].get_y()
 
     def get_middley(self):
         return self.Blocks[0].get_y()
@@ -565,6 +574,9 @@ class squareBlock():
         self.orientation +=1
         if self.orientation > 3:
             self.orientation = 0
+
+    def get_orientation(self):
+        return self.orientation, "Square"
 
     def get_left(self):
         return self.Blocks[0].get_x()
@@ -660,6 +672,9 @@ class lineBlock():
         self.orientation +=1
         if self.orientation > 3:
             self.orientation = 0
+
+    def get_orientation(self):
+        return self.orientation, "line"
 
     def get_left(self):
         if self.orientation == 0:
@@ -858,8 +873,85 @@ while True:
         RIGHT = False
 
     # Rotate the current shape,
+    Turn = True
     if ROTATE:
-        activeShape.Rotate()
+        orientation = activeShape.get_orientation()
+        #Rules for the rotation, stops the shape rotating into another shape.
+        for y in range((len(Row))):
+            for x in range((len(Row[y]))):
+                if orientation[1] == 'line':
+                    for l in range(1,4):
+                        if orientation[0] == 0:
+                            if activeShape.get_middlex() + l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 1:
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + l == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 2:
+                            if activeShape.get_middlex() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 3:
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - l == Row[y][x].get_y():
+                                Turn = False
+                for l in range(1,3):
+                    if orientation[1] == 'L':
+                        if orientation[0] == 0:
+                            if activeShape.get_middlex() + l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + 1 == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 1:
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + l == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 2:
+                            if activeShape.get_left() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - 1 == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 3:
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - l == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() + 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                    if orientation[1] == 'reverseL':
+                        if orientation[0] == 0:
+                            if activeShape.get_middlex() + l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - 1 == Row[y][x].get_y():
+                                    Turn = False
+                        if orientation[0] == 1:
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + l == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() + 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 2:
+                            if activeShape.get_left() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + 1 == Row[y][x].get_y():
+                                Turn = False
+                        if orientation[0] == 3:
+                            if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - l == Row[y][x].get_y():
+                                Turn = False
+                            if activeShape.get_left() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                                Turn = False
+                if orientation[1] == 'triangle':
+                    if orientation[0] == 0:
+                        if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + 1 == Row[y][x].get_y():
+                            Turn = False
+                    if orientation[0] == 1:
+                        if activeShape.get_left() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                            Turn = False
+                    if orientation[0] == 2:
+                        if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() - 1 == Row[y][x].get_y():
+                            Turn = False
+                    if orientation[0] == 3:
+                        if activeShape.get_middlex() + 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
+                            Turn = False
+
+        if Turn:
+            activeShape.Rotate()
         ROTATE = False
 
     # The rate of drop counter, keeping the game going at a decent pace.
