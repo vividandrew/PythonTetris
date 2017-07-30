@@ -524,9 +524,9 @@ class reverseLBlock():
         if self.orientation == 1:
             return self.Blocks[0].get_x()
         if self.orientation == 2:
-            return self.Blocks[0].get_x()
-        if self.orientation == 3:
             return self.Blocks[3].get_x()
+        if self.orientation == 3:
+            return self.Blocks[0].get_x()
 
     def get_right(self):
         if self.orientation == 0:
@@ -534,7 +534,7 @@ class reverseLBlock():
         if self.orientation == 1:
             return self.Blocks[3].get_x()
         if self.orientation == 2:
-            return self.Blocks[1].get_x()
+            return self.Blocks[0].get_x()
         if self.orientation == 3:
             return self.Blocks[0].get_x()
 
@@ -965,7 +965,7 @@ while True:
                                         Turn = False
                                     if activeShape.get_middlex() == Row[y][x].get_x() and activeShape.get_middley() + 1 == Row[y][x].get_y():
                                         Turn = False
-                                    if activeShape.get_y()+ 1 > windowHeight/Scale:
+                                    if activeShape.get_middley()+ 1 > windowHeight/Scale:
                                         Turn = False
                                     if activeShape.get_middlex() + l == windowWidth and activeShape.get_middlex() - l == Row[y][x].get_x():
                                         Turn = False
@@ -974,7 +974,7 @@ while True:
                                         Turn = False
                                     if activeShape.get_middlex() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                         Turn = False
-                                    if activeShape.get_y()+ 2 > windowHeight/Scale:
+                                    if activeShape.get_middley()+ 2 > windowHeight/Scale:
                                         Turn = False
                                 if orientation[0] == 2:
                                     if activeShape.get_left() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
@@ -1001,7 +1001,7 @@ while True:
                                         Turn = False
                                     if activeShape.get_middlex() + 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                         Turn = False
-                                    if activeShape.get_y()+ 2 > windowHeight/Scale:
+                                    if activeShape.get_middley()+ 2 > windowHeight/Scale:
                                         Turn = False
                                 if orientation[0] == 2:
                                     if activeShape.get_left() - l == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
@@ -1013,7 +1013,7 @@ while True:
                                         Turn = False
                                     if activeShape.get_left() - 1 == Row[y][x].get_x() and activeShape.get_middley() == Row[y][x].get_y():
                                         Turn = False
-                                    if activeShape.get_y() + 1 > windowHeight / Scale:
+                                    if activeShape.get_middley() + 1 > windowHeight / Scale:
                                         Turn = False
                         if orientation[1] == 'triangle':
                             if orientation[0] == 0:
@@ -1045,7 +1045,7 @@ while True:
                     activeShape.set_grounded("Drop")
                     nextShape()
                 RODcounter = 0
-            RODcounter += 1
+            RODcounter += lvl*0.1+1
 
             # This loop goes through each block that is stationary, compares with the active block('s) and grounds them
             for i in range(len(Row)):
@@ -1054,7 +1054,6 @@ while True:
                     checkColLx = activeShape.get_left()
                     checkColRx = activeShape.get_right()
                     checkColTooth = activeShape.get_tooth()
-                    #if checkColTooth[len(checkColTooth) - 1] == 'Triangle':
                     if checkColTooth:
                         if checkColTooth[len(checkColTooth)-1] == 'Triangle':
                             if len(checkColTooth) > 4:
@@ -1072,6 +1071,13 @@ while True:
                                     nextShape()
 
                         if checkColTooth[len(checkColTooth) - 1] == 'L':
+                            checkColTx = checkColTooth[0]
+                            checkColTy = checkColTooth[1]
+                            if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
+                                activeShape.set_grounded("Checking one tooth")
+                                nextShape()
+
+                        if checkColTooth[len(checkColTooth) - 1] == 'reverseL':
                             checkColTx = checkColTooth[0]
                             checkColTy = checkColTooth[1]
                             if checkColTy + 1 == Row[i][x].get_y() and checkColTx == Row[i][x].get_x():
