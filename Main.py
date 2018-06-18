@@ -15,7 +15,7 @@ windowWidth = 800
 windowHeight = 800
 gameWindowWidth = windowWidth/2
 gameWindowHeight = windowHeight - 40
-Scale = gameWindowWidth/10
+Scale = int(gameWindowWidth/10)
 
 pygame.init()
 
@@ -32,7 +32,7 @@ RED = (255, 0, 0)
 
 # This variable holds the Row numbers for later scoring system.
 Row = []
-for i in range(gameWindowHeight/Scale):
+for i in range(int(gameWindowHeight/Scale)):
     Row.append([])
 
 # some essential variables for the player and others
@@ -57,7 +57,7 @@ currentShape = random.randint(0, 4) # generates an number which will be associat
 #4 = Line
 
 # Set up the fonts
-font = pygame.font.SysFont('Arial', windowWidth/15)
+font = pygame.font.SysFont('Arial', int(windowWidth/15))
 
 #<editor-fold desc="Game Font">
 lvlFont = font.render("Level: " + str(lvl), False, WHITE, BLACK)
@@ -67,12 +67,12 @@ lvlRect.left = windowWidth - Scale * 9
 
 scoreFont = font.render("Score: " + str(score), False, WHITE, BLACK)
 scoreRect = scoreFont.get_rect()
-scoreRect.top = windowHeight/10 + Scale * 3
+scoreRect.top = int(windowHeight/10) + Scale * 3
 scoreRect.left = windowWidth - Scale * 9
 #</editor-fold>
 
 #<editor-fold desc="Start Screen font">
-tFont = pygame.font.SysFont('Arial', windowWidth/7)
+tFont = pygame.font.SysFont('Arial', int(windowWidth/7))
 titleFont = tFont.render("Python Tetris", False, (0,0,255),ORANGE)
 titleRect = titleFont.get_rect()
 titleRect.top = Scale*6
@@ -85,7 +85,7 @@ buttonRect.centerx = windowWidth/2
 #</editor-fold>
 
 #<editor-fold desc="Instructions font">
-insFont = pygame.font.SysFont('Arial', windowWidth/Scale)
+insFont = pygame.font.SysFont('Arial', int(windowWidth/Scale))
 instFont = []
 instRect = []
 instFont.append(insFont.render("                    How to play                     ", False, WHITE,  BLACK))
@@ -181,7 +181,7 @@ class block():
 class triangleBlock():
     def __init__(self):
         self.Blocks = [block(GREEN), block(GREEN), block(GREEN), block(GREEN)]
-        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.Blocks[0].set_x((int(gameWindowWidth/Scale)) / 2)
         self.orientation = 0
         self.grounded = False
 
@@ -229,7 +229,7 @@ class triangleBlock():
             #print boxes.get_x()
 
     def drop(self):
-        #if self.get_bottom() + 1 == gameWindowHeight/Scale:
+        #if self.get_bottom() + 1 == int(gameWindowHeight/Scale):
             #self.set_grounded("Drop event")
             #return True
         #else:
@@ -241,7 +241,7 @@ class triangleBlock():
         #print callFrom
         for i in range(len(self.Blocks)):
             #print self.Blocks[i].get_y()
-            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            Row[int(self.Blocks[i].get_y())].append(self.Blocks[i])
             self.Blocks[i].setGrounded(True)
         #print len(Row[17])
 
@@ -319,7 +319,7 @@ class triangleBlock():
 class LBlock():
     def __init__(self):
         self.Blocks = [block(RED), block(RED), block(RED), block(RED)]
-        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.Blocks[0].set_x((int(gameWindowWidth/Scale)) / 2)
         self.orientation = 0
         self.grounded = False
 
@@ -373,7 +373,7 @@ class LBlock():
         self.grounded = True
         #print callFrom
         for i in range(len(self.Blocks)):
-            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            Row[int(self.Blocks[i].get_y())].append(self.Blocks[i])
             self.Blocks[i].setGrounded(True)
 
     def Direction(self, LEFT, RIGHT):
@@ -450,7 +450,7 @@ class LBlock():
 class reverseLBlock():
     def __init__(self):
         self.Blocks = [block(BLUE), block(BLUE), block(BLUE), block(BLUE)]
-        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.Blocks[0].set_x((int(gameWindowWidth/Scale)) / 2)
         self.orientation = 0
         self.grounded = False
 
@@ -504,7 +504,7 @@ class reverseLBlock():
         self.grounded = True
         #print callFrom
         for i in range(len(self.Blocks)):
-            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            Row[int(self.Blocks[i].get_y())].append(self.Blocks[i])
             self.Blocks[i].setGrounded(True)
 
     def Direction(self, LEFT, RIGHT):
@@ -581,7 +581,7 @@ class reverseLBlock():
 class squareBlock():
     def __init__(self):
         self.Blocks = [block(YELLOW), block(YELLOW), block(YELLOW), block(YELLOW)]
-        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.Blocks[0].set_x((int(gameWindowWidth/Scale)) / 2)
         self.orientation = 0
         self.grounded = False
 
@@ -613,7 +613,7 @@ class squareBlock():
         self.grounded = True
         #print callFrom
         for i in range(len(self.Blocks)):
-            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            Row[int(self.Blocks[i].get_y())].append(self.Blocks[i])
             self.Blocks[i].setGrounded(True)
 
     def Direction(self, LEFT, RIGHT):
@@ -656,7 +656,7 @@ class squareBlock():
 class lineBlock():
     def __init__(self):
         self.Blocks = [block(PURPLE), block(PURPLE), block(PURPLE), block(PURPLE)]
-        self.Blocks[0].set_x((gameWindowWidth/Scale) / 2)
+        self.Blocks[0].set_x((int(gameWindowWidth/Scale)) / 2)
         self.orientation = 0
         self.grounded = False
 
@@ -711,7 +711,7 @@ class lineBlock():
         self.grounded = True
         #print callFrom
         for i in range(len(self.Blocks)):
-            Row[self.Blocks[i].get_y()].append(self.Blocks[i])
+            Row[int(self.Blocks[i].get_y())].append(self.Blocks[i])
             self.Blocks[i].setGrounded(True)
 
     def Direction(self, LEFT, RIGHT):
@@ -907,11 +907,11 @@ while True:
                             RIGHT = False
                     else:
                         if activeShape.get_left() - 1 == checkColx:
-                            for i in range(activeShape.get_top(), activeShape.get_bottom()):
+                            for i in range(int(activeShape.get_top()), int(activeShape.get_bottom())):
                                 if i == checkColy:
                                     LEFT = False
                         if activeShape.get_right() + 1 == checkColx:
-                            for i in range(activeShape.get_top(), activeShape.get_bottom()):
+                            for i in range(int(activeShape.get_top()), int(activeShape.get_bottom())):
                                 if i == checkColy:
                                     RIGHT = False
                     if activeShape.get_left() - 1 == checkColx and activeShape.get_middley() == checkColy:
@@ -924,7 +924,7 @@ while True:
             if RIGHT or LEFT and not activeShape.get_grounded():
                 if blocksLx <= 0:
                     LEFT = False
-                if blocksRx >= gameWindowWidth/Scale - 1:
+                if blocksRx >= int(gameWindowWidth/Scale) - 1:
                     RIGHT = False
 
                 activeShape.Direction(LEFT, RIGHT)
@@ -1041,7 +1041,7 @@ while True:
             if RODcounter > ROD - lvl or DROPFAST:
                 activeShape.drop()
                 activeShape.update()
-                if activeShape.get_bottom() + 1 == gameWindowHeight/Scale:
+                if activeShape.get_bottom() + 1 == int(gameWindowHeight/Scale):
                     activeShape.set_grounded("Drop")
                     nextShape()
                 RODcounter = 0
@@ -1084,7 +1084,7 @@ while True:
                                 activeShape.set_grounded("Checking one tooth")
                                 nextShape()
 
-                    if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == gameWindowHeight/Scale:
+                    if checkColy + 1 == Row[i][x].get_y() and checkColLx <= Row[i][x].get_x() and checkColRx >= Row[i][x].get_x() or checkColy + 1 == int(gameWindowHeight/Scale):
                         activeShape.set_grounded("Checking without a tooth")
                         nextShape()
 
